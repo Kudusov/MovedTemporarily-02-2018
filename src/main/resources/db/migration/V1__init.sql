@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS Users (
+  email TEXT UNIQUE NOT NULL,
+  name TEXT,
+  age INTEGER
+);
