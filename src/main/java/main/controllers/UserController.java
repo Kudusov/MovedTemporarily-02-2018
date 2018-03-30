@@ -2,6 +2,7 @@ package main.controllers;
 
 
 import main.models.User;
+import main.services.FileStorageService;
 import main.views.*;
 import main.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -10,9 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 
 
-@CrossOrigin(origins = {"https://moved-temporarily-front.herokuapp.com"}, allowCredentials = "true")
+//@CrossOrigin(origins = {"https://moved-temporarily-front.herokuapp.com"}, allowCredentials = "true")
 @RestController
 public class UserController {
 
@@ -21,7 +23,7 @@ public class UserController {
     public UserController(@NotNull UserService userService) {
         this.users = userService;
     }
-
+/*
     @RequestMapping(path = "/api/user/signup", method = RequestMethod.POST)
     public ResponseEntity signUp(@RequestBody User signUpData, HttpSession httpSession) {
         final UserService.ErrorCodes error = users.addUser(signUpData);
@@ -40,7 +42,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMsg.INTERNAL_SERVER_ERROR);
         }
     }
-
+*/
     @RequestMapping(path = "api/user/login", method = RequestMethod.POST)
     public ResponseEntity logIn(@RequestBody LoginForm loginData, HttpSession httpSession) {
         final UserService.ErrorCodes error = users.login(loginData);
@@ -130,7 +132,8 @@ public class UserController {
     }
 
     @RequestMapping(path = "api/user/info", method = RequestMethod.GET)
-    public ResponseEntity currentUserInfo(HttpSession httpSession) {
+    public ResponseEntity currentUserInfo(HttpSession httpSession) throws IOException {
+        FileStorageService fs = new FileStorageService();
         final UserInfoForm  data = new UserInfoForm();
         final String login = (String) httpSession.getAttribute("userLogin");
 
