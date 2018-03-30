@@ -1,7 +1,6 @@
 package main.controllers;
 
 
-import main.models.User;
 import main.services.FileStorageService;
 import main.views.*;
 import main.services.UserService;
@@ -43,6 +42,7 @@ public class UserController {
         }
     }
 */
+/*
     @RequestMapping(path = "api/user/login", method = RequestMethod.POST)
     public ResponseEntity logIn(@RequestBody LoginForm loginData, HttpSession httpSession) {
         final UserService.ErrorCodes error = users.login(loginData);
@@ -68,7 +68,8 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMsg.INTERNAL_SERVER_ERROR);
         }
     }
-
+*/
+/*
     @RequestMapping(path = "/api/user/logout", method = RequestMethod.GET)
     public ResponseEntity logOut(HttpSession httpSession) {
         final String login = (String) httpSession.getAttribute("userLogin");
@@ -80,7 +81,7 @@ public class UserController {
         httpSession.invalidate();
         return ResponseEntity.status(HttpStatus.OK).body(ResponseMsg.OK);
     }
-
+*/
     @RequestMapping(path = "/api/user/changeEmail", method = RequestMethod.POST)
     public ResponseEntity changeMail(@RequestBody MailForm mailData, HttpSession httpSession) {
         final String login = (String) httpSession.getAttribute("userLogin");
