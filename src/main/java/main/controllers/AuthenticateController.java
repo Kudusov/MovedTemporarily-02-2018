@@ -1,7 +1,6 @@
 package main.controllers;
 
 import main.models.User;
-import main.services.UserService;
 import main.services.UserServiceDAO;
 import main.views.LoginForm;
 import main.views.ResponseMsg;
@@ -45,25 +44,25 @@ public class AuthenticateController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseMsg.BAD_REQUEST);
         }
 
-        final UserService.ErrorCodes error =  userService.login(loginData);
+        final UserServiceDAO.ErrorCodes error =  userService.login(loginData);
 
         switch (error) {
             case INVALID_AUTH_DATA:
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseMsg.INVALID_LOGIN);
             case INCORRECT_PASSWORD:
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseMsg.INCORRECT_PASSWORD);
-            case OK: {
+            case OK:
                 session.setAttribute("userLogin", loginData.getLogin());
                 // Magic number обход(
                 session.setMaxInactiveInterval(4 * 6 * 10 * 10 * 6 * 6);
                 return ResponseEntity.status(HttpStatus.OK).body(ResponseMsg.OK);
-            }
+
             default:
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMsg.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @RequestMapping(path = "/api/user/logout", method = RequestMethod.GET)
+    @RequestMapping(path = "/api/user/logout", method = RequestMethod.DELETE)
     public ResponseEntity logOut(HttpSession httpSession) {
         final String login = (String) httpSession.getAttribute("userLogin");
 

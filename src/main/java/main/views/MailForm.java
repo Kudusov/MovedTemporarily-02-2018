@@ -12,6 +12,10 @@ public final class MailForm {
         this.userMail = userMail;
     }
 
+    public boolean isValid() {
+        return this.userMail != null;
+    }
+
     @SuppressWarnings("unused")
     public String getUserMail() {
         return userMail;
