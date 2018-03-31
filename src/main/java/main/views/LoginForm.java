@@ -19,6 +19,10 @@ public final class LoginForm {
         this.password = password;
     }
 
+    public boolean isValid() {
+        return ((login != null || email != null) && password != null);
+    }
+
     public String getLogin() {
         return login;
     }

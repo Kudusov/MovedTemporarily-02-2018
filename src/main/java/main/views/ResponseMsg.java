@@ -11,7 +11,7 @@ public enum ResponseMsg {
     BAD_REQUEST("Not all Json fields are filled"),
     NOT_LOGGED_IN("You are not autorized"),
     CONFLICT("Login or Email are already exist"),
-    INVALID_LOGIN("User with such is not registered"),
+    INVALID_LOGIN("User with such auth data is not registered"),
     INCORRECT_PASSWORD("Incorrect password"),
     INTERNAL_SERVER_ERROR("Server error. Sorry:(");
 

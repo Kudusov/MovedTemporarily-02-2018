@@ -15,6 +15,10 @@ public class PassForm {
         this.newPassword = newPassword;
     }
 
+    public boolean isValid() {
+        return (this.oldPassword != null && this.newPassword != null);
+    }
+
     @SuppressWarnings("unused")
     public String getOldPassword() {
         return oldPassword;
