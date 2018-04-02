@@ -25,7 +25,7 @@ public class AuthenticateController {
     @RequestMapping(path = "/api/user/signup", method = RequestMethod.POST)
     public ResponseEntity signUp(@RequestBody User userData, HttpSession session) {
         try {
-            userService.singUp(userData);
+            userService.signUp(userData);
 
         } catch (DuplicateKeyException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseMsg.CONFLICT);
@@ -35,7 +35,7 @@ public class AuthenticateController {
 
         session.setAttribute("userLogin", userData.getLogin());
         session.setMaxInactiveInterval(4 * 6 * 10 * 10 * 6 * 6);
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseMsg.OK);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ResponseMsg.CREATED);
     }
 
     @RequestMapping(path = "/api/user/login", method = RequestMethod.POST)

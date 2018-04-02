@@ -37,7 +37,7 @@ public class UserServiceDAO {
     // сделать обертку над этим методом чтобы при ошибке произошел Rollback
     // и монжно было  возвращать коды ошибок
     @Transactional
-    public void singUp(User userData) {
+    public void signUp(User userData) {
         final Integer userId = getNextId();
 
         final String createUserQuery = "INSERT INTO Users (id, email, login, password) VALUES(?, ?, ?, ?)";
@@ -166,10 +166,10 @@ public class UserServiceDAO {
                     row.getString("password"));
 
     private static final RowMapper<UserInfoForm> USER_INFO_FORM_ROW_MAPPER = (row, num) ->
-            new UserInfoForm(row.getString("email"),
-                    row.getString("login"));
+            new UserInfoForm(row.getString("login"),
+                    row.getString("email"));
 
-    public static final  RowMapper<ScoreView> SCORE_VIEW_ROW_MAPPER = (row, num) ->
+    private static final  RowMapper<ScoreView> SCORE_VIEW_ROW_MAPPER = (row, num) ->
             new ScoreView(row.getString("login"),
                     row.getInt("score"));
 }
