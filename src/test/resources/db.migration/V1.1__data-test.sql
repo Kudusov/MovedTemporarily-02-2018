@@ -1,14 +1,14 @@
-INSERT INTO Users (id, email, login, password)
-    VALUES (0, 'eleven04@mail.ru', 'Eleven', 'password'),
-      (1, 'hopper@gmail.com', 'ChiefHopper', 'password'),
-      (2, 'harrington@outlook.com', 'SteveH', 'password'),
-      (3, 'brenner@gmail.com', 'Doctor', 'password'),
-      (4, 'dustin@mail.ru', 'Dustin', 'password'),
-      (5, 'winona@mail.ru', 'Winona', 'password'),
-      (6, 'nancy99@gmail.com', 'Nancy','password'),
-      (7, 'white@outlook.com', 'WalterWhite','password'),
-      (8, 'richard@nixon.com', 'Richie','password'),
-      (9, 'calvin@coolige.com', 'Calve','password');
+INSERT INTO Users (email, login, password)
+    VALUES ('eleven04@mail.ru', 'Eleven', 'password'),
+      ('hopper@gmail.com', 'ChiefHopper', 'password'),
+      ('harrington@outlook.com', 'SteveH', 'password'),
+      ('brenner@gmail.com', 'Doctor', 'password'),
+      ('dustin@mail.ru', 'Dustin', 'password'),
+      ('winona@mail.ru', 'Winona', 'password'),
+      ('nancy99@gmail.com', 'Nancy','password'),
+      ('white@outlook.com', 'WalterWhite','password'),
+      ('richard@nixon.com', 'Richie','password'),
+      ('calvin@coolige.com', 'Calve','password');
 
 INSERT INTO Scores (user_id)
     VALUES (0),

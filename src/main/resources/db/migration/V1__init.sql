@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS Users (
   id SERIAL PRIMARY KEY ,
-  email TEXT UNIQUE NOT NULL,
-  login TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL
+  email VARCHAR(50) UNIQUE,
+  login VARCHAR(50) UNIQUE,
+  password VARCHAR(50)
 );
 
 CREATE TABLE IF NOT EXISTS Scores (
@@ -11,5 +11,4 @@ CREATE TABLE IF NOT EXISTS Scores (
   count_games INTEGER DEFAULT 0,
   count_wins INTEGER DEFAULT 0,
   score INTEGER DEFAULT 0
-
-)
+);

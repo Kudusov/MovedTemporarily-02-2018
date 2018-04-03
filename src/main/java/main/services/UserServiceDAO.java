@@ -36,13 +36,17 @@ public class UserServiceDAO {
 
     // сделать обертку над этим методом чтобы при ошибке произошел Rollback
     // и монжно было  возвращать коды ошибок
+    private Integer getIdByLogin(String login) {
+        final String query = "SELECT Id FROM Users WHERE login = ?";
+        return jdbcTemplate.queryForObject(query, Integer.class, login);
+    }
+    // сделать обертку над этим методом чтобы при ошибке произошел Rollback
+    // и монжно было  возвращать коды ошибок
     @Transactional
     public void signUp(User userData) {
-        final Integer userId = getNextId();
-
-        final String createUserQuery = "INSERT INTO Users (id, email, login, password) VALUES(?, ?, ?, ?)";
-        jdbcTemplate.update(createUserQuery, userId, userData.getEmail(), userData.getLogin(), userData.getPassword());
-
+        final String createUserQuery = "INSERT INTO Users (email, login, password) VALUES(?, ?, ?)";
+        jdbcTemplate.update(createUserQuery, userData.getEmail(), userData.getLogin(), userData.getPassword());
+        final Integer userId = getIdByLogin(userData.getLogin());
         final String createScore = "INSERT INTO Scores (user_id) VALUES (?)";
         jdbcTemplate.update(createScore, userId);
 
@@ -141,10 +145,11 @@ public class UserServiceDAO {
 
     }
 
-    private Integer getNextId() {
-        final String sqlGetNext = "SELECT nextval(pg_get_serial_sequence('Users', 'id'))";
-        return jdbcTemplate.queryForObject(sqlGetNext, Integer.class);
-    }
+//    @Supresswarnings("unused")
+//    private Integer getNextId() {
+//        final String sqlGetNext = "SELECT nextval(pg_get_serial_sequence('Users', 'id'))";
+//        return jdbcTemplate.queryForObject(sqlGetNext, Integer.class);
+//    }
 
     private LoginForm getUserByIdOrEmail(LoginForm loginData) {
         try {
