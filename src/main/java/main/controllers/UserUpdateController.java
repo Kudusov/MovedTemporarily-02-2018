@@ -36,7 +36,10 @@ public class UserUpdateController {
                 return ResponseEntity.status(HttpStatus.OK).body(ResponseMsg.OK);
 
             case EMAIL_OCCUPIED:
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMsg.CONFLICT);
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseMsg.CONFLICT);
+
+            case INVALID_LOGIN:
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseMsg.BAD_REQUEST);
 
             default:
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMsg.INTERNAL_SERVER_ERROR);
@@ -65,7 +68,6 @@ public class UserUpdateController {
 
              default:
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMsg.INTERNAL_SERVER_ERROR);
-
         }
 
     }

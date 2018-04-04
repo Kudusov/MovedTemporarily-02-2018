@@ -34,12 +34,11 @@ public class UserServiceDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // сделать обертку над этим методом чтобы при ошибке произошел Rollback
-    // и монжно было  возвращать коды ошибок
     private Integer getIdByLogin(String login) {
         final String query = "SELECT Id FROM Users WHERE login = ?";
         return jdbcTemplate.queryForObject(query, Integer.class, login);
     }
+
     // сделать обертку над этим методом чтобы при ошибке произошел Rollback
     // и монжно было  возвращать коды ошибок
     @Transactional
