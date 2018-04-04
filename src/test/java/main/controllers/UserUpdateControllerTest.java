@@ -62,6 +62,7 @@ public class UserUpdateControllerTest {
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.CREATED.getMsg()));
     }
 
+    /*
     @Test
     public void changeEmailOk() throws Exception {
         createUserOk();
@@ -83,7 +84,8 @@ public class UserUpdateControllerTest {
                 .andExpect(jsonPath("$.email").value(newEmail));
 
     }
-
+    */
+    
     @Test
     public void changeEmailUnauthorized() throws Exception {
         mockMvc.perform(
@@ -95,6 +97,7 @@ public class UserUpdateControllerTest {
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.NOT_LOGGED_IN.getMsg()));
     }
 
+    /*
     @Test
     public void changeEmailConflict() throws Exception {
         createUserOk();
@@ -110,7 +113,7 @@ public class UserUpdateControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.CONFLICT.getMsg()));
     }
-
+    */
     @Test
     public void changetEmailNullEmail() throws Exception {
         mockMvc.perform(
