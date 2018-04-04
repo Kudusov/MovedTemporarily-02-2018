@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Locale;
 
 //import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -66,30 +67,37 @@ public class UserUpdateControllerTest {
     @Test
     public void changeEmailOk() throws Exception {
         createUserOk();
+        final String newEmail = faker.internet().emailAddress();
         mockMvc.perform(
                 put("/api/user/changeEmail")
                         .contentType("application/json")
-                        .content("{\"userMail\":\"" + faker.internet().emailAddress() + "\"}")
+                        .content("{\"newMail\":\"" + newEmail + "\"}")
                         .sessionAttr("userLogin", login))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.OK.getMsg()));
 
-    }
+        mockMvc.perform(
+                get("/api/user/info")
+                        .sessionAttr("userLogin", login))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value(newEmail));
 
+    }
 
     @Test
     public void changeEmailUnauthorized() throws Exception {
         mockMvc.perform(
                 put("/api/user/changeEmail")
                         .contentType("application/json")
-                        .content("{\"userMail\":\"" + faker.internet().emailAddress() + "\"}"))
+                        .content("{\"newMail\":\"" + faker.internet().emailAddress() + "\"}"))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.NOT_LOGGED_IN.getMsg()));
     }
 
-    /*
+
     @Test
     public void changeEmailConflict() throws Exception {
         createUserOk();
@@ -99,19 +107,19 @@ public class UserUpdateControllerTest {
         mockMvc.perform(
                 put("/api/user/changeEmail")
                         .contentType("application/json")
-                        .content("{\"userMail\":\"" + existEmail + "\"}")
+                        .content("{\"newMail\":\"" + existEmail + "\"}")
                         .sessionAttr("userLogin", login))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.CONFLICT.getMsg()));
     }
-    */
+
     @Test
     public void changetEmailNullEmail() throws Exception {
         mockMvc.perform(
                 put("/api/user/changeEmail")
                         .contentType("application/json")
-                        .content("{\"userMail\":" + null + '}')
+                        .content("{\"newMail\":" + null + '}')
                         .sessionAttr("userLogin", login))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isBadRequest())

@@ -83,7 +83,7 @@ public class UserServiceDAO {
         }
         try {
             final String queryChangeMail = "Update Users Set email = ? Where login = ?";
-            jdbcTemplate.update(queryChangeMail, mailData.getUserMail(), login);
+            jdbcTemplate.update(queryChangeMail, mailData.getNewMail(), login);
             return ErrorCodes.OK;
         } catch (DuplicateKeyException ex) {
             return ErrorCodes.EMAIL_OCCUPIED;
