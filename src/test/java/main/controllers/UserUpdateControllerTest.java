@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -62,7 +62,7 @@ public class UserUpdateControllerTest {
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.CREATED.getMsg()));
     }
 
-    /*
+
     @Test
     public void changeEmailOk() throws Exception {
         createUserOk();
@@ -76,16 +76,9 @@ public class UserUpdateControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.OK.getMsg()));
 
-        mockMvc.perform(
-                get("/api/user/info")
-                        .sessionAttr("userLogin", login))
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value(newEmail));
-
     }
-    */
-    
+
+
     @Test
     public void changeEmailUnauthorized() throws Exception {
         mockMvc.perform(
