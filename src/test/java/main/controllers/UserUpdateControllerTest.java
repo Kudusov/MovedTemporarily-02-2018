@@ -66,11 +66,10 @@ public class UserUpdateControllerTest {
     @Test
     public void changeEmailOk() throws Exception {
         createUserOk();
-        final String newEmail = faker.internet().emailAddress();
         mockMvc.perform(
                 put("/api/user/changeEmail")
                         .contentType("application/json")
-                        .content("{\"userMail\":\"" + newEmail + "\"}")
+                        .content("{\"userMail\":\"" + faker.internet().emailAddress() + "\"}")
                         .sessionAttr("userLogin", login))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isOk())
