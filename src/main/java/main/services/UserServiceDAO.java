@@ -144,11 +144,11 @@ public class UserServiceDAO {
 
     }
 
-//    @Supresswarnings("unused")
-//    private Integer getNextId() {
-//        final String sqlGetNext = "SELECT nextval(pg_get_serial_sequence('Users', 'id'))";
-//        return jdbcTemplate.queryForObject(sqlGetNext, Integer.class);
-//    }
+    @SuppressWarnings("unused")
+    private Integer getNextId() {
+        final String sqlGetNext = "SELECT nextval(pg_get_serial_sequence('Users', 'id'))";
+        return jdbcTemplate.queryForObject(sqlGetNext, Integer.class);
+    }
 
     private LoginForm getUserByIdOrEmail(LoginForm loginData) {
         try {

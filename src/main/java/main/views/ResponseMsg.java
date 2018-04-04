@@ -1,7 +1,6 @@
 package main.views;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 @SuppressWarnings("unused")
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
