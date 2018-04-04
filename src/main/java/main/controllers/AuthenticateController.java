@@ -6,6 +6,7 @@ import main.views.LoginForm;
 import main.views.ResponseMsg;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,9 +23,13 @@ public class AuthenticateController {
         this.userService = userService;
     }
 
-    @RequestMapping(path = "/api/user/signup", method = RequestMethod.POST)
+    @RequestMapping(path = "/api/user/signup", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity signUp(@RequestBody User userData, HttpSession session) {
         try {
+            if (userData.getLogin() == null || userData.getEmail() == null || userData.getPassword() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseMsg.BAD_REQUEST);
+            }
             userService.signUp(userData);
 
         } catch (DuplicateKeyException ex) {
@@ -38,7 +43,8 @@ public class AuthenticateController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseMsg.CREATED);
     }
 
-    @RequestMapping(path = "/api/user/login", method = RequestMethod.POST)
+    @RequestMapping(path = "/api/user/login", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity login(@RequestBody LoginForm loginData, HttpSession session) {
         if (!loginData.isValid()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseMsg.BAD_REQUEST);
@@ -62,7 +68,7 @@ public class AuthenticateController {
         }
     }
 
-    @RequestMapping(path = "/api/user/logout", method = RequestMethod.DELETE)
+    @RequestMapping(path = "/api/user/logout", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity logOut(HttpSession httpSession) {
         final String login = (String) httpSession.getAttribute("userLogin");
 

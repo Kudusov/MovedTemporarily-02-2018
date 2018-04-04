@@ -22,7 +22,6 @@ public enum ResponseMsg {
         this.msg = msg;
     }
 
-    @JsonValue
     public String getMsg() {
         return msg;
     }

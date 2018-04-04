@@ -1,59 +1,304 @@
 package main.controllers;
 
-import main.models.User;
-import main.services.UserServiceDAO;
+import main.Main;
+import com.github.javafaker.Faker;
 import main.views.ResponseMsg;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
-
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Locale;
 import static org.junit.Assert.*;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT)
-
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = Main.class)
+@AutoConfigureMockMvc(print = MockMvcPrint.NONE)
+@Transactional
 public class AuthenticateControllerTest {
 
-    @MockBean
-    private UserServiceDAO userServiceDAO;
-
     @Autowired
-    private TestRestTemplate restTemplate;
+    private MockMvc mockMvc;
 
-    private final User testUser = new User("e.mail@mail.ru", "test", "test", 1337);
+    private static Faker faker;
+    private static String email;
+    private static String login;
+    private static String password;
 
-    @Test
-    public void signUpSuccess() {
-        final HttpEntity<User> httpEntity = new HttpEntity<>(testUser);
-        final ResponseEntity<ResponseMsg> responseEntity = restTemplate.exchange("/api/user/signup",
-                HttpMethod.POST, httpEntity, ResponseMsg.class);
-        assertNotNull(responseEntity.getBody());
-        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-        assertEquals(ResponseMsg.CREATED, responseEntity.getBody());
+    @BeforeAll
+    public static void setUpFaker() {
+        faker = new Faker(new Locale("en-US"));
+    }
+
+    @BeforeAll
+    public static void setUpValues() {
+        email = faker.internet().emailAddress();
+        login = faker.name().username();
+        password = faker.internet().password();
+    }
+
+    public void createUserOk() throws Exception {
+        mockMvc.perform(
+                post("/api/user/signup")
+                        .contentType("application/json")
+                        .content("{\"email\":\"" + email + "\"," +
+                                "\"login\":\"" + login + "\"," +
+                                "\"score\":\"" + 0 + "\"," +
+                                "\"password\":\"" + password + "\"}"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.msg").value(ResponseMsg.CREATED.getMsg()));
     }
 
     @Test
-    public void signUpUserExist() {
-        final User testUser2 = new User("hopper@gmail.com", "ChiefHopper", "password", 1);
-        doThrow(new DuplicateKeyException("")).when(userServiceDAO).signUp(eq(testUser2));
-        final HttpEntity<User> httpEntity = new HttpEntity<>(testUser2);
-        final ResponseEntity<ResponseMsg> responseEntity = restTemplate.exchange("/api/user/signup",
-                HttpMethod.POST, httpEntity, ResponseMsg.class);
-        assertEquals(HttpStatus.CONFLICT, responseEntity.getBody());
-        verify(userServiceDAO).signUp(eq(testUser2));
+    public void signUpOk() throws Exception {
+        final MvcResult result = mockMvc.perform(
+                post("/api/user/signup")
+                        .contentType("application/json")
+                        .content("{\"email\":\"" + email + "\"," +
+                                "\"login\":\"" + login + "\"," +
+                                "\"score\":\"" + null + "\"," +
+                                "\"password\":\"" + password + "\"}"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isCreated()).andReturn();
+        final MockHttpSession session = (MockHttpSession) result.getRequest().getSession();
+        System.out.println("name = " + login + "userlogin = " + session.getAttribute("userLogin"));
+        System.out.println(result.getRequest().getAttribute ("userLogin"));
     }
+
+    @Test
+    public void createUserConflict() throws Exception {
+        createUserOk();
+        final MvcResult result =  this.mockMvc.perform(
+                post("/api/user/signup")
+                        .contentType("application/json")
+                        .content("{\"email\":\"" + email + "\"," +
+                                "\"login\":\"" + login + "\"," +
+                                "\"password\":\"" + password + "\"}"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isConflict()).andReturn();
+
+        final MockHttpSession session = (MockHttpSession) result.getRequest().getSession();
+        System.out.println(result.getResponse().getContentAsString());
+        System.out.println("name = " + login + "userlogin = " + session.getAttribute("userLogin"));
+        System.out.println(result.getResponse().getCookie("userLogin"));
+    }
+
+    @Test
+    public void createUserMailConflict() throws Exception {
+        createUserOk();
+        this.mockMvc.perform(
+                post("/api/user/signup")
+                        .contentType("application/json")
+                        .content("{\"email\":\"" + email + "\"," +
+                                "\"login\":\"" + faker.name().username() + "\"," +
+                                "\"password\":\"" + faker.internet().password() + "\"}"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.msg").value(ResponseMsg.CONFLICT.getMsg()));
+    }
+
+    @Test
+    public void createUserLoginConflict() throws Exception {
+        createUserOk();
+        this.mockMvc.perform(
+                post("/api/user/signup")
+                        .contentType("application/json")
+                        .content("{\"email\":\"" + faker.internet().emailAddress() + "\"," +
+                                "\"login\":\"" + login + "\"," +
+                                "\"password\":\"" + faker.internet().password() + "\"}"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.msg").value(ResponseMsg.CONFLICT.getMsg()));
+    }
+
+    @Test
+    public void createNullMail() throws  Exception {
+        this.mockMvc.perform(
+                post("/api/user/signup")
+                        .contentType("application/json")
+                        .content("{\"email\":" + null + ',' +
+                                "\"login\":\"" + faker.name().username() + "\"," +
+                                "\"password\":\"" + faker.internet().password() + "\"}"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void createNullLogin() throws  Exception {
+        this.mockMvc.perform(
+                post("/api/user/signup")
+                        .contentType("application/json")
+                        .content("{\"email\":\"" + faker.internet().emailAddress() + "\"," +
+                                "\"login\":" + null + ',' +
+                                "\"password\":\"" + faker.internet().password() + "\"}"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void createNullPassword() throws  Exception {
+        this.mockMvc.perform(
+                post("/api/user/signup")
+                        .contentType("application/json")
+                        .content("{\"email\":\"" + faker.internet().emailAddress() + "\"," +
+                                "\"login\":\"" + faker.name().username() + "\"," +
+                                "\"password\":" + null + '}'))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    /*----------------------------Login tests-------------------------------------------*/
+    @Test
+    public void loginUserOk() throws Exception {
+        createUserOk();
+        this.mockMvc.perform(
+                post("/api/user/login")
+                        .contentType("application/json")
+                        .content("{\"email\":\"" + email + "\"," +
+                                "\"login\":\"" + login + "\"," +
+                                "\"password\":\"" + password + "\"}"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.msg").value(ResponseMsg.OK.getMsg()));
+    }
+
+    @Test
+    public void loginCheckCookies() throws Exception {
+        createUserOk();
+        final MvcResult result = this.mockMvc.perform(
+               post("/api/user/login")
+                        .contentType("application/json")
+                        .content("{\"email\":\"" + email + "\"," +
+                                "\"login\":\"" + login + "\"," +
+                                "\"password\":\"" + password + "\"}"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.msg").value(ResponseMsg.OK.getMsg()))
+                .andReturn();
+        final MockHttpSession session = (MockHttpSession) result.getRequest().getSession();
+        assertEquals(login, session.getAttribute("userLogin"));
+    }
+
+    @Test
+    public void loginByUserMail() throws Exception {
+        createUserOk();
+        this.mockMvc.perform(
+                post("/api/user/login")
+                        .contentType("application/json")
+                        .content("{\"email\":" + null + ',' +
+                                "\"login\":\"" + login + "\"," +
+                                "\"password\":\"" + password + "\"}"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.msg").value(ResponseMsg.OK.getMsg()));
+    }
+
+
+    @Test
+    public void loginByUserLogin() throws Exception {
+        createUserOk();
+        this.mockMvc.perform(
+                post("/api/user/login")
+                        .contentType("application/json")
+                        .content("{\"email\":\"" + email + "\"," +
+                                "\"login\":" + null + ',' +
+                                "\"password\":\"" + password + "\"}"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.msg").value(ResponseMsg.OK.getMsg()));
+    }
+
+    @Test
+    public void loginIncorrectUser() throws Exception {
+        this.mockMvc.perform(
+                post("/api/user/login")
+                        .contentType("application/json")
+                        .content("{\"email\":" + null + ',' +
+                                "\"login\":" + null + ',' +
+                                "\"password\":\"" + password + "\"}"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.msg").value(ResponseMsg.BAD_REQUEST.getMsg()));
+    }
+
+    @Test
+    public void loginNullPasswors() throws Exception {
+        this.mockMvc.perform(
+                post("/api/user/login")
+                        .contentType("application/json")
+                        .content("{\"email\":\"" + email + "\"," +
+                                "\"login\":\"" + login + "\"," +
+                                "\"password\":" + null + '}'))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.msg").value(ResponseMsg.BAD_REQUEST.getMsg()));
+    }
+
+    @Test
+    public void loginNotExistingUser() throws Exception {
+        this.mockMvc.perform(
+                post("/api/user/login")
+                        .contentType("application/json")
+                        .content("{\"email\":\"" + faker.internet().emailAddress() + "\"," +
+                                "\"login\":\"" + faker.name().username() + "\"," +
+                                "\"password\":\"" + faker.internet().password() + "\"}"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.msg").value(ResponseMsg.INVALID_LOGIN.getMsg()));
+    }
+
+    @Test
+    public void loginIncorrectPassword() throws Exception {
+        createUserOk();
+        this.mockMvc.perform(
+                post("/api/user/login")
+                        .contentType("application/json")
+                        .content("{\"email\":\"" + email + "\"," +
+                                "\"login\":\"" + login + "\"," +
+                                "\"password\":\"" + faker.internet().password() + "\"}"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.msg").value(ResponseMsg.INCORRECT_PASSWORD.getMsg()));
+    }
+
+    /* ---------------------------------- Test logout ----------------------------------------*/
+
+    @Test
+    public void logoutOk() throws Exception {
+        this.mockMvc.perform(
+                delete("/api/user/logout")
+                        .contentType("application/json")
+                        .sessionAttr("userLogin", login))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.msg").value(ResponseMsg.OK.getMsg()));
+
+    }
+
+    @Test
+    public void logoutUnauthorized() throws  Exception {
+        this.mockMvc.perform(
+                delete("/api/user/logout")
+                        .contentType("application/json"))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.msg").value(ResponseMsg.NOT_LOGGED_IN.getMsg()));
+
+    }
+
 }

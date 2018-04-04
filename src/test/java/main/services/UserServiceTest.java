@@ -26,26 +26,27 @@ public class UserServiceTest {
     private final User testUser = new User("e.mail@mail.ru", "test", "test", 1337);
 
     @Test
-    public void signUpSuccess() throws Exception {
+    public void signUpSuccess() {
         userServiceDAO.signUp(testUser);
     }
 
     @Test(expected = DuplicateKeyException.class)
-    public void signUpDuplicateEmail() throws Exception {
+    public void signUpDuplicateEmail() {
         userServiceDAO.signUp(testUser);
-        userServiceDAO.signUp(new User(testUser.getEmail(), "test2", "test", 1337));
+        userServiceDAO.signUp(new User(testUser.getEmail(), "test2", "test", 0));
     }
 
+
     @Test(expected = DuplicateKeyException.class)
-    public void signUpDuplicateLogin() throws Exception {
+    public void signUpDuplicateLogin() {
         userServiceDAO.signUp(testUser);
-        userServiceDAO.signUp(new User("mail@mail.ru", testUser.getLogin(), "test", 1337));
+        userServiceDAO.signUp(new User("mail@mail.ru", testUser.getLogin(), "test", 0));
     }
 
     @Test
     public void loginCorrect() {
         userServiceDAO.signUp(testUser);
-        LoginForm loginForm = new LoginForm(testUser.getLogin(), null, testUser.getPassword());
+        final LoginForm loginForm = new LoginForm(testUser.getLogin(), null, testUser.getPassword());
         UserServiceDAO.ErrorCodes errorCode = userServiceDAO.login(loginForm);
 
         assertEquals(testUser.getLogin(), loginForm.getLogin());
@@ -66,7 +67,7 @@ public class UserServiceTest {
     @Test
     public void loginIncorrectValues() {
         userServiceDAO.signUp(testUser);
-        LoginForm loginForm = new LoginForm(null, "alexxx228@mail.com", testUser.getPassword());
+        final LoginForm loginForm = new LoginForm(null, "alexxx228@mail.com", testUser.getPassword());
         UserServiceDAO.ErrorCodes errorCode = userServiceDAO.login(loginForm);
         assertEquals(errorCode, UserServiceDAO.ErrorCodes.INVALID_AUTH_DATA);
 
@@ -84,8 +85,8 @@ public class UserServiceTest {
     @Test
     public void getUserInfoCorrect() {
         userServiceDAO.signUp(testUser);
-        UserInfoForm userInfoForm = new UserInfoForm();
-        UserServiceDAO.ErrorCodes errorCode = userServiceDAO.getUserInfo(testUser.getLogin(), userInfoForm);
+        final UserInfoForm userInfoForm = new UserInfoForm();
+        final UserServiceDAO.ErrorCodes errorCode = userServiceDAO.getUserInfo(testUser.getLogin(), userInfoForm);
 
         assertEquals(testUser.getLogin(), userInfoForm.getLogin());
         assertEquals(testUser.getEmail(), userInfoForm.getEmail());
@@ -94,8 +95,8 @@ public class UserServiceTest {
 
     @Test
     public void getUserInfoInvalidLogin() {
-        UserInfoForm userInfoForm = new UserInfoForm();
-        UserServiceDAO.ErrorCodes errorCode = userServiceDAO.getUserInfo(testUser.getLogin(), userInfoForm);
+        final UserInfoForm userInfoForm = new UserInfoForm();
+        final UserServiceDAO.ErrorCodes errorCode = userServiceDAO.getUserInfo(testUser.getLogin(), userInfoForm);
 
         assertEquals(null, userInfoForm.getLogin());
         assertEquals(null, userInfoForm.getEmail());
@@ -105,11 +106,11 @@ public class UserServiceTest {
     @Test
     public void changeEmailCorrect() {
         userServiceDAO.signUp(testUser);
-        String mail = "darkstalker98@mail.ru";
-        MailForm mailForm = new MailForm(mail);
-        UserServiceDAO.ErrorCodes errorCode = userServiceDAO.changeEmail(testUser.getLogin(), mailForm);
+        final String mail = "darkstalker98@mail.ru";
+        final MailForm mailForm = new MailForm(mail);
+        final UserServiceDAO.ErrorCodes errorCode = userServiceDAO.changeEmail(testUser.getLogin(), mailForm);
 
-        UserInfoForm infoForm = new UserInfoForm();
+        final UserInfoForm infoForm = new UserInfoForm();
         userServiceDAO.getUserInfo(testUser.getLogin(), infoForm);
 
         assertEquals(mail, infoForm.getEmail());
@@ -119,22 +120,22 @@ public class UserServiceTest {
     @Test
     public void changeEmailIncorrect() {
         userServiceDAO.signUp(testUser);
-        String mail = null;
-        MailForm mailForm = new MailForm(mail);
-        UserServiceDAO.ErrorCodes errorCode = userServiceDAO.changeEmail(testUser.getLogin(), mailForm);
+
+        final MailForm mailForm = new MailForm(null);
+        final UserServiceDAO.ErrorCodes errorCode = userServiceDAO.changeEmail(testUser.getLogin(), mailForm);
 
         assertEquals(errorCode, UserServiceDAO.ErrorCodes.INVALID_LOGIN);
     }
 
     @Test
     public void changeDuplicateEmail() {
-        String mail = "hopper@gmail.com";
+        final String mail = "hopper@gmail.com";
         final User testUser2 = new User(mail, "test2", "test2", 228);
         userServiceDAO.signUp(testUser);
         userServiceDAO.signUp(testUser2);
 
-        MailForm mailForm = new MailForm(mail);
-        UserServiceDAO.ErrorCodes errorCode = userServiceDAO.changeEmail(testUser.getLogin(), mailForm);
+        final MailForm mailForm = new MailForm(mail);
+        final UserServiceDAO.ErrorCodes errorCode = userServiceDAO.changeEmail(testUser.getLogin(), mailForm);
 
         assertEquals(errorCode, UserServiceDAO.ErrorCodes.EMAIL_OCCUPIED);
     }
@@ -142,13 +143,13 @@ public class UserServiceTest {
     @Test
     public void changePassCorrect() {
         userServiceDAO.signUp(testUser);
-        String pass = "password";
-        PassForm passForm = new PassForm(testUser.getPassword(), pass);
+        final String pass = "password";
+        final PassForm passForm = new PassForm(testUser.getPassword(), pass);
         UserServiceDAO.ErrorCodes errorCode = userServiceDAO.changePass(testUser.getLogin(), passForm);
 
         assertEquals(errorCode, UserServiceDAO.ErrorCodes.OK);
 
-        LoginForm loginForm = new LoginForm(testUser.getLogin(), null, pass);
+        final LoginForm loginForm = new LoginForm(testUser.getLogin(), null, pass);
         errorCode = userServiceDAO.login(loginForm);
 
         assertEquals(errorCode, UserServiceDAO.ErrorCodes.OK);
@@ -157,13 +158,13 @@ public class UserServiceTest {
     @Test
     public void changePassIncorrect() {
         userServiceDAO.signUp(testUser);
-        String pass = null;
-        PassForm passForm = new PassForm(testUser.getPassword(), pass);
+
+        PassForm passForm = new PassForm(testUser.getPassword(), null);
         UserServiceDAO.ErrorCodes errorCode = userServiceDAO.changePass(testUser.getLogin(), passForm);
 
         assertEquals(errorCode, UserServiceDAO.ErrorCodes.INCORRECT_PASSWORD);
 
-        pass = testUser.getPassword();
+        final String pass = testUser.getPassword();
 
         passForm = new PassForm("tirpirdir", pass);
         errorCode = userServiceDAO.changePass(testUser.getLogin(), passForm);
@@ -180,12 +181,12 @@ public class UserServiceTest {
         userServiceDAO.signUp(testUser1);
         userServiceDAO.signUp(testUser2);
 
-        List<ScoreView> result = new ArrayList<>();
+        final List<ScoreView> result = new ArrayList<>();
         result.add(new ScoreView(testUser.getLogin(), testUser.getScore()));
         result.add(new ScoreView(testUser2.getLogin(), testUser2.getScore()));
         result.add(new ScoreView(testUser1.getLogin(), testUser1.getScore()));
 
-        UserServiceDAO.ErrorCodes errorCode = userServiceDAO.getAllScoreBoard(result);
+        final UserServiceDAO.ErrorCodes errorCode = userServiceDAO.getAllScoreBoard(result);
 
         assertEquals(errorCode, UserServiceDAO.ErrorCodes.OK);
     }
@@ -201,7 +202,7 @@ public class UserServiceTest {
         userServiceDAO.signUp(testUser2);
         userServiceDAO.signUp(testUser3);
 
-        List<ScoreView> result = new ArrayList<>();
+        final List<ScoreView> result = new ArrayList<>();
         result.add(new ScoreView(testUser.getLogin(), testUser.getScore()));
         result.add(new ScoreView(testUser2.getLogin(), testUser3.getScore()));
         result.add(new ScoreView(testUser2.getLogin(), testUser2.getScore()));
@@ -210,9 +211,9 @@ public class UserServiceTest {
         final Integer pos = 1;
         final Integer count = 2;
 
-        ScoreRequest scoreRequest = new ScoreRequest(pos, count);
+        final ScoreRequest scoreRequest = new ScoreRequest(pos, count);
 
-        UserServiceDAO.ErrorCodes errorCode = userServiceDAO.getPartScoreBoard(scoreRequest, result);
+        final UserServiceDAO.ErrorCodes errorCode = userServiceDAO.getPartScoreBoard(scoreRequest, result);
 
         assertEquals(errorCode, UserServiceDAO.ErrorCodes.OK);
     }
