@@ -6,23 +6,23 @@ import javax.validation.constraints.NotNull;
 
 public final class MailForm {
 
-    private @NotNull String newMail;
+    private @NotNull String newEmail;
 
-    public MailForm(@JsonProperty("newEmail") String newMail) {
-        this.newMail = newMail;
+    public MailForm(@JsonProperty("newEmail") String newEmail) {
+        this.newEmail = newEmail;
     }
 
     public boolean isValid() {
-        return this.newMail != null;
+        return this.newEmail != null;
     }
 
     @SuppressWarnings("unused")
-    public String getNewMail() {
-        return newMail;
+    public String getNewEmail() {
+        return newEmail;
     }
 
     @SuppressWarnings("unused")
-    public void setNewMail(String newMail) {
-        this.newMail = newMail;
+    public void setNewEmail(String newEmail) {
+        this.newEmail = newEmail;
     }
 }

@@ -71,7 +71,7 @@ public class UserUpdateControllerTest {
         mockMvc.perform(
                 put("/api/user/changeEmail")
                         .contentType("application/json")
-                        .content("{\"newMail\":\"" + newEmail + "\"}")
+                        .content("{\"newEmail\":\"" + newEmail + "\"}")
                         .sessionAttr("userLogin", login))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isOk())
@@ -91,7 +91,7 @@ public class UserUpdateControllerTest {
         mockMvc.perform(
                 put("/api/user/changeEmail")
                         .contentType("application/json")
-                        .content("{\"newMail\":\"" + faker.internet().emailAddress() + "\"}"))
+                        .content("{\"newEmail\":\"" + faker.internet().emailAddress() + "\"}"))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.NOT_LOGGED_IN.getMsg()));
@@ -107,7 +107,7 @@ public class UserUpdateControllerTest {
         mockMvc.perform(
                 put("/api/user/changeEmail")
                         .contentType("application/json")
-                        .content("{\"newMail\":\"" + existEmail + "\"}")
+                        .content("{\"newEmail\":\"" + existEmail + "\"}")
                         .sessionAttr("userLogin", login))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isConflict())
@@ -119,7 +119,7 @@ public class UserUpdateControllerTest {
         mockMvc.perform(
                 put("/api/user/changeEmail")
                         .contentType("application/json")
-                        .content("{\"newMail\":" + null + '}')
+                        .content("{\"newEmail\":" + null + '}')
                         .sessionAttr("userLogin", login))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isBadRequest())
