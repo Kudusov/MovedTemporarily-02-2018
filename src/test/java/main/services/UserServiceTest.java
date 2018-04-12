@@ -217,5 +217,5 @@ public class UserServiceTest {
 
         assertEquals(errorCode, UserServiceDAO.ErrorCodes.OK);
     }
-
+    
 }

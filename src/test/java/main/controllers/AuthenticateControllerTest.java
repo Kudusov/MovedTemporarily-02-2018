@@ -38,13 +38,14 @@ public class AuthenticateControllerTest {
     private static String login;
     private static String password;
 
-    @BeforeAll
-    public static void setUpFaker() {
-        faker = new Faker(new Locale("en-US"));
-    }
+//    @BeforeAll
+//    public static void setUpFaker() {
+//        faker = new Faker(new Locale("en-US"));
+//    }
 
     @BeforeAll
     public static void setUpValues() {
+        faker = new Faker(new Locale("en-US"));
         email = faker.internet().emailAddress();
         login = faker.name().username();
         password = faker.internet().password();
@@ -65,7 +66,7 @@ public class AuthenticateControllerTest {
 
     @Test
     public void signUpOk() throws Exception {
-        final MvcResult result = mockMvc.perform(
+        mockMvc.perform(
                 post("/api/user/signup")
                         .contentType("application/json")
                         .content("{\"email\":\"" + email + "\"," +
@@ -73,28 +74,21 @@ public class AuthenticateControllerTest {
                                 "\"score\":\"" + null + "\"," +
                                 "\"password\":\"" + password + "\"}"))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(status().isCreated()).andReturn();
-        final MockHttpSession session = (MockHttpSession) result.getRequest().getSession();
-        System.out.println("name = " + login + "userlogin = " + session.getAttribute("userLogin"));
-        System.out.println(result.getRequest().getAttribute ("userLogin"));
+                .andExpect(status().isCreated());
+
     }
 
     @Test
     public void createUserConflict() throws Exception {
         createUserOk();
-        final MvcResult result =  this.mockMvc.perform(
+        this.mockMvc.perform(
                 post("/api/user/signup")
                         .contentType("application/json")
                         .content("{\"email\":\"" + email + "\"," +
                                 "\"login\":\"" + login + "\"," +
                                 "\"password\":\"" + password + "\"}"))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(status().isConflict()).andReturn();
-
-        final MockHttpSession session = (MockHttpSession) result.getRequest().getSession();
-        System.out.println(result.getResponse().getContentAsString());
-        System.out.println("name = " + login + "userlogin = " + session.getAttribute("userLogin"));
-        System.out.println(result.getResponse().getCookie("userLogin"));
+                .andExpect(status().isConflict());
     }
 
     @Test
