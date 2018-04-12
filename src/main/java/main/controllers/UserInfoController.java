@@ -38,7 +38,7 @@ public class UserInfoController {
                 return ResponseEntity.status(HttpStatus.OK).body(result);
 
             case INVALID_LOGIN:
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(login);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMsg.INVALID_LOGIN);
 
             default:
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMsg.INTERNAL_SERVER_ERROR);
