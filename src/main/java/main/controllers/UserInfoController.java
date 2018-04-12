@@ -15,7 +15,6 @@ import java.util.List;
 
 /* Добавить метода для ScoreBoard */
 //@CrossOrigin(origins = {"https://moved-temporarily-front.herokuapp.com"}, allowCredentials = "true", methods = {RequestMethod.POST, RequestMethod.GET})
-
 @RestController
 @CrossOrigin(origins = {"https://moved-temporarily-front.herokuapp.com"},
         allowCredentials = "true", allowedHeaders = {"origin", "content-type", "accept", "authorization"},

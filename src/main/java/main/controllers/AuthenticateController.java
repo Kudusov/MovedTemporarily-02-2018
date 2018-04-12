@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-// @CrossOrigin(origins = {"https://moved-temporarily-front.herokuapp.com"}, allowCredentials = "true", methods = {RequestMethod.POST, RequestMethod.DELETE})
+//@CrossOrigin(origins = {"https://moved-temporarily-front.herokuapp.com"}, allowCredentials = "true", methods = {RequestMethod.POST, RequestMethod.DELETE})
 @RestController
 @CrossOrigin(origins = {"https://moved-temporarily-front.herokuapp.com"},
         allowCredentials = "true", allowedHeaders = {"origin", "content-type", "accept", "authorization"},
