@@ -61,6 +61,7 @@ public class UserServiceDAO {
             return ErrorCodes.INCORRECT_PASSWORD;
         }
 
+        loginData.setLogin(dbUser.getLogin());
         return ErrorCodes.OK;
 
     }

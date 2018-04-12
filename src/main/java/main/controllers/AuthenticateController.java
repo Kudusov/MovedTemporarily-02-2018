@@ -12,12 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 
-//@CrossOrigin(origins = {"https://moved-temporarily-front.herokuapp.com"}, allowCredentials = "true", methods = {RequestMethod.POST, RequestMethod.DELETE})
 @RestController
-@CrossOrigin(origins = {"https://moved-temporarily-front.herokuapp.com"},
-        allowCredentials = "true", allowedHeaders = {"origin", "content-type", "accept", "authorization"},
-        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
-                RequestMethod.DELETE, RequestMethod.OPTIONS, RequestMethod.HEAD})
+@CrossOrigin(origins = {"https://moved-temporarily-front.herokuapp.com"}, allowCredentials = "true")
 public class AuthenticateController {
     private UserServiceDAO userService;
 
