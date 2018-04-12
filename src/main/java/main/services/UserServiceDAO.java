@@ -166,8 +166,8 @@ public class UserServiceDAO {
     }
     
     private static final RowMapper<LoginForm> LOGIN_FORM_ROW_MAPPER = (row, num) ->
-            new LoginForm(row.getString("email"),
-                    row.getString("login"),
+            new LoginForm(row.getString("login"),
+                    row.getString("email"),
                     row.getString("password"));
 
     private static final RowMapper<UserInfoForm> USER_INFO_FORM_ROW_MAPPER = (row, num) ->
