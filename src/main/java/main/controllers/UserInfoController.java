@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /* Добавить метода для ScoreBoard */
-@CrossOrigin(origins = {"https://moved-temporarily-front.herokuapp.com"}, allowCredentials = "true")
+@CrossOrigin(origins = {"https://moved-temporarily-front.herokuapp.com"}, allowCredentials = "true", methods = {RequestMethod.POST, RequestMethod.GET})
 @RestController
 public class UserInfoController {
     private UserServiceDAO userService;
