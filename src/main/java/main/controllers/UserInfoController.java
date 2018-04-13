@@ -1,10 +1,7 @@
 package main.controllers;
 
 import main.services.UserServiceDAO;
-import main.views.ResponseMsg;
-import main.views.ScoreRequest;
-import main.views.ScoreView;
-import main.views.UserInfoForm;
+import main.views.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -64,5 +61,10 @@ public class UserInfoController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMsg.INTERNAL_SERVER_ERROR);
 
         }
+    }
+
+    @RequestMapping(path = "/api/about", method = RequestMethod.GET)
+    public ResponseEntity aboutText() {
+        return ResponseEntity.status(HttpStatus.OK).body(new AboutForm(null));
     }
 }
