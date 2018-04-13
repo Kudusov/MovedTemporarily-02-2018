@@ -37,7 +37,7 @@ public class AuthenticateController {
         }
 
         session.setAttribute("userLogin", userData.getLogin());
-         session.setMaxInactiveInterval(4 * 6 * 10 * 10 * 6 * 6);
+        session.setMaxInactiveInterval(4 * 6 * 10 * 10 * 6 * 6);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseMsg.CREATED);
     }
 
@@ -57,8 +57,7 @@ public class AuthenticateController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseMsg.INCORRECT_PASSWORD);
             case OK:
                 session.setAttribute("userLogin", loginData.getLogin());
-                // Magic number обход(
-                 session.setMaxInactiveInterval(4 * 6 * 10 * 10 * 6 * 6);
+                session.setMaxInactiveInterval(4 * 6 * 10 * 10 * 6 * 6);
                 return ResponseEntity.status(HttpStatus.OK).body(ResponseMsg.OK);
 
             default:
