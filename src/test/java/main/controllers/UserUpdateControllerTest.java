@@ -4,6 +4,7 @@ package main.controllers;
 import com.github.javafaker.Faker;
 import main.Main;
 import main.views.ResponseMsg;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
+import java.util.Map;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -52,10 +55,8 @@ public class UserUpdateControllerTest {
         mockMvc.perform(
                 post("/api/user/signup")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + email + "\"," +
-                                "\"login\":\"" + login + "\"," +
-                                "\"score\":\"" + 0 + "\"," +
-                                "\"password\":\"" + password + "\"}"))
+                        .content(new JSONObject(Map.of("email", email, "login", login,
+                                "score", 0, "password", password)).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.CREATED.getMsg()));
@@ -69,7 +70,7 @@ public class UserUpdateControllerTest {
         mockMvc.perform(
                 put("/api/user/changeEmail")
                         .contentType("application/json")
-                        .content("{\"newEmail\":\"" + newEmail + "\"}")
+                        .content(new JSONObject(Map.of("newEmail", newEmail)).toString())
                         .sessionAttr("userLogin", login))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isOk())
@@ -89,7 +90,7 @@ public class UserUpdateControllerTest {
         mockMvc.perform(
                 put("/api/user/changeEmail")
                         .contentType("application/json")
-                        .content("{\"newEmail\":\"" + faker.internet().emailAddress() + "\"}"))
+                        .content(new JSONObject(Map.of("newEmail", faker.internet().emailAddress())).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.NOT_LOGGED_IN.getMsg()));
@@ -105,7 +106,7 @@ public class UserUpdateControllerTest {
         mockMvc.perform(
                 put("/api/user/changeEmail")
                         .contentType("application/json")
-                        .content("{\"newEmail\":\"" + existEmail + "\"}")
+                        .content(new JSONObject(Map.of("newEmail", existEmail)).toString())
                         .sessionAttr("userLogin", login))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isConflict())
@@ -133,8 +134,7 @@ public class UserUpdateControllerTest {
         mockMvc.perform(
                 put("/api/user/changePass")
                         .contentType("application/json")
-                        .content("{\"oldPassword\":\"" + password + "\"," +
-                                "\"newPassword\":\"" + newPassword + "\"}")
+                        .content(new JSONObject(Map.of("oldPassword", password, "newPassword", newPassword)).toString())
                         .sessionAttr("userLogin", login))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isOk());
@@ -142,9 +142,7 @@ public class UserUpdateControllerTest {
         this.mockMvc.perform(
                 post("/api/user/login")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + email + "\"," +
-                                "\"login\":\"" + login + "\"," +
-                                "\"password\":\"" + newPassword + "\"}"))
+                        .content(new JSONObject(Map.of("email", email, "login", login, "password", newPassword)).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.OK.getMsg()));
@@ -156,8 +154,7 @@ public class UserUpdateControllerTest {
         mockMvc.perform(
                 put("/api/user/changePass")
                         .contentType("application/json")
-                        .content("{\"oldPassword\":\"" + faker.internet().password() + "\"," +
-                                "\"newPassword\":\"" + faker.internet().password() + "\"}")
+                        .content(new JSONObject(Map.of("oldPassword", faker.internet().password(), "newPassword", faker.internet().password())).toString())
                         .sessionAttr("userLogin", login))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isForbidden())
@@ -182,9 +179,8 @@ public class UserUpdateControllerTest {
         mockMvc.perform(
                 put("/api/user/changePass")
                         .contentType("application/json")
-                        .content("{\"oldPassword\":\"" + faker.internet().password() + "\"," +
-                                "\"newPassword\":\"" + faker.internet().password() + "\"}"))
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                        .content(new JSONObject(Map.of("oldPassword", faker.internet().password(), "newPassword", faker.internet().password())).toString()))
+                        .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.NOT_LOGGED_IN.getMsg()));
     }
@@ -194,8 +190,7 @@ public class UserUpdateControllerTest {
         mockMvc.perform(
                 put("/api/user/changePass")
                         .contentType("application/json")
-                        .content("{\"oldPassword\":\"" + faker.internet().password() + "\"," +
-                                "\"newPassword\":\"" + faker.internet().password() + "\"}")
+                        .content(new JSONObject(Map.of("oldPassword", faker.internet().password(), "newPassword", faker.internet().password())).toString())
                         .sessionAttr("userLogin", faker.name().username()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isNotFound())
