@@ -3,6 +3,7 @@ package main.controllers;
 import main.Main;
 import com.github.javafaker.Faker;
 import main.views.ResponseMsg;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Locale;
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -38,10 +41,6 @@ public class AuthenticateControllerTest {
     private static String login;
     private static String password;
 
-//    @BeforeAll
-//    public static void setUpFaker() {
-//        faker = new Faker(new Locale("en-US"));
-//    }
 
     @BeforeAll
     public static void setUpValues() {
@@ -55,10 +54,7 @@ public class AuthenticateControllerTest {
         mockMvc.perform(
                 post("/api/user/signup")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + email + "\"," +
-                                "\"login\":\"" + login + "\"," +
-                                "\"score\":\"" + 0 + "\"," +
-                                "\"password\":\"" + password + "\"}"))
+                        .content(new JSONObject(Map.of("email", email, "login", login, "score", 0, "password", password)).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.CREATED.getMsg()));
@@ -69,10 +65,7 @@ public class AuthenticateControllerTest {
         mockMvc.perform(
                 post("/api/user/signup")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + email + "\"," +
-                                "\"login\":\"" + login + "\"," +
-                                "\"score\":\"" + null + "\"," +
-                                "\"password\":\"" + password + "\"}"))
+                        .content(new JSONObject(Map.of("email", email, "login", login, "score", 0, "password", password)).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isCreated());
 
@@ -84,9 +77,7 @@ public class AuthenticateControllerTest {
         this.mockMvc.perform(
                 post("/api/user/signup")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + email + "\"," +
-                                "\"login\":\"" + login + "\"," +
-                                "\"password\":\"" + password + "\"}"))
+                        .content(new JSONObject(Map.of("email", email, "login", login, "score", 0, "password", password)).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isConflict());
     }
@@ -97,9 +88,8 @@ public class AuthenticateControllerTest {
         this.mockMvc.perform(
                 post("/api/user/signup")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + email + "\"," +
-                                "\"login\":\"" + faker.name().username() + "\"," +
-                                "\"password\":\"" + faker.internet().password() + "\"}"))
+                        .content(new JSONObject(Map.of("email", email, "login",
+                                faker.name().username(), "score", 0, "password", faker.internet().password())).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.CONFLICT.getMsg()));
@@ -111,9 +101,8 @@ public class AuthenticateControllerTest {
         this.mockMvc.perform(
                 post("/api/user/signup")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + faker.internet().emailAddress() + "\"," +
-                                "\"login\":\"" + login + "\"," +
-                                "\"password\":\"" + faker.internet().password() + "\"}"))
+                        .content(new JSONObject(Map.of("email", faker.internet().emailAddress(), "login", login,
+                                "score", 0, "password", faker.internet().password())).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.CONFLICT.getMsg()));
@@ -124,9 +113,8 @@ public class AuthenticateControllerTest {
         this.mockMvc.perform(
                 post("/api/user/signup")
                         .contentType("application/json")
-                        .content("{\"email\":" + null + ',' +
-                                "\"login\":\"" + faker.name().username() + "\"," +
-                                "\"password\":\"" + faker.internet().password() + "\"}"))
+                        .content(new JSONObject(Map.of("login", faker.name().username(),
+                                "score", 0, "password", faker.internet().password())).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isBadRequest());
 
@@ -137,9 +125,8 @@ public class AuthenticateControllerTest {
         this.mockMvc.perform(
                 post("/api/user/signup")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + faker.internet().emailAddress() + "\"," +
-                                "\"login\":" + null + ',' +
-                                "\"password\":\"" + faker.internet().password() + "\"}"))
+                        .content(new JSONObject(Map.of("email", faker.internet().emailAddress(),
+                                "score", 0, "password", faker.internet().password())).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isBadRequest());
     }
@@ -149,9 +136,8 @@ public class AuthenticateControllerTest {
         this.mockMvc.perform(
                 post("/api/user/signup")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + faker.internet().emailAddress() + "\"," +
-                                "\"login\":\"" + faker.name().username() + "\"," +
-                                "\"password\":" + null + '}'))
+                        .content(new JSONObject(Map.of("email", faker.internet().emailAddress(), "login", faker.internet().password(),
+                                "score", 0)).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isBadRequest());
     }
@@ -164,9 +150,7 @@ public class AuthenticateControllerTest {
         this.mockMvc.perform(
                 post("/api/user/login")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + email + "\"," +
-                                "\"login\":\"" + login + "\"," +
-                                "\"password\":\"" + password + "\"}"))
+                        .content(new JSONObject(Map.of("email", email, "login", login, "password", password)).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.msg").value(ResponseMsg.OK.getMsg()));
     }
@@ -177,9 +161,7 @@ public class AuthenticateControllerTest {
         final MvcResult result = this.mockMvc.perform(
                post("/api/user/login")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + email + "\"," +
-                                "\"login\":\"" + login + "\"," +
-                                "\"password\":\"" + password + "\"}"))
+                        .content(new JSONObject(Map.of("email", email, "login", login, "password", password)).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.OK.getMsg()))
@@ -194,9 +176,8 @@ public class AuthenticateControllerTest {
         this.mockMvc.perform(
                 post("/api/user/login")
                         .contentType("application/json")
-                        .content("{\"email\":" + null + ',' +
-                                "\"login\":\"" + login + "\"," +
-                                "\"password\":\"" + password + "\"}"))
+                        .content(new JSONObject(Map.of("email", email, "password", password)).toString()))
+
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.OK.getMsg()));
@@ -209,35 +190,19 @@ public class AuthenticateControllerTest {
         this.mockMvc.perform(
                 post("/api/user/login")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + email + "\"," +
-                                "\"login\":" + null + ',' +
-                                "\"password\":\"" + password + "\"}"))
+                        .content(new JSONObject(Map.of("login", login, "password", password)).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.OK.getMsg()));
     }
 
-    @Test
-    public void loginIncorrectUser() throws Exception {
-        this.mockMvc.perform(
-                post("/api/user/login")
-                        .contentType("application/json")
-                        .content("{\"email\":" + null + ',' +
-                                "\"login\":" + null + ',' +
-                                "\"password\":\"" + password + "\"}"))
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.msg").value(ResponseMsg.BAD_REQUEST.getMsg()));
-    }
 
     @Test
-    public void loginNullPasswors() throws Exception {
+    public void loginNullPassword() throws Exception {
         this.mockMvc.perform(
                 post("/api/user/login")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + email + "\"," +
-                                "\"login\":\"" + login + "\"," +
-                                "\"password\":" + null + '}'))
+                        .content(new JSONObject(Map.of("email", email, "login", login)).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.BAD_REQUEST.getMsg()));
@@ -248,9 +213,7 @@ public class AuthenticateControllerTest {
         this.mockMvc.perform(
                 post("/api/user/login")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + faker.internet().emailAddress() + "\"," +
-                                "\"login\":\"" + faker.name().username() + "\"," +
-                                "\"password\":\"" + faker.internet().password() + "\"}"))
+                        .content(new JSONObject(Map.of("email", faker.internet().emailAddress(), "login", faker.name().username(), "password", faker.internet().password())).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.INVALID_LOGIN.getMsg()));
@@ -262,9 +225,7 @@ public class AuthenticateControllerTest {
         this.mockMvc.perform(
                 post("/api/user/login")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + email + "\"," +
-                                "\"login\":\"" + login + "\"," +
-                                "\"password\":\"" + faker.internet().password() + "\"}"))
+                        .content(new JSONObject(Map.of("email", email, "login", login, "password", faker.internet().password())).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.INCORRECT_PASSWORD.getMsg()));

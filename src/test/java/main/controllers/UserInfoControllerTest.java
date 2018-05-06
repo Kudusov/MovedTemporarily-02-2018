@@ -3,6 +3,7 @@ package main.controllers;
 import com.github.javafaker.Faker;
 import main.Main;
 import main.views.ResponseMsg;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
+import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -51,10 +53,8 @@ public class UserInfoControllerTest {
         mockMvc.perform(
                 post("/api/user/signup")
                         .contentType("application/json")
-                        .content("{\"email\":\"" + email + "\"," +
-                                "\"login\":\"" + login + "\"," +
-                                "\"score\":\"" + 0 + "\"," +
-                                "\"password\":\"" + password + "\"}"))
+                        .content(new JSONObject(Map.of("email", email, "login", login,
+                                "score", 0, "password", password)).toString()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.CREATED.getMsg()));
