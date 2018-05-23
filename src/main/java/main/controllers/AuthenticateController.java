@@ -54,7 +54,7 @@ public class AuthenticateController {
 
         switch (error) {
             case INVALID_AUTH_DATA:
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseMsg.INVALID_LOGIN);
+                return ResponseEntity.status(HttpStatus.OK).body(ResponseMsg.INVALID_LOGIN);
             case INCORRECT_PASSWORD:
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseMsg.INCORRECT_PASSWORD);
             case OK:
