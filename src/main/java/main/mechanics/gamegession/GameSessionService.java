@@ -3,6 +3,7 @@ package main.mechanics.gamegession;
 import main.mechanics.game.Player;
 import main.mechanics.game.UserPlayer;
 import main.mechanics.messages.MsgError;
+import main.mechanics.messages.MsgGameStarted;
 import main.mechanics.messages.MsgLobbyCreated;
 import main.mechanics.messages.MsgYouInQueue;
 import main.services.UserServiceDAO;
@@ -16,7 +17,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ThreadLocalRandom;
 
+@SuppressWarnings("unused")
 @Service
 public class GameSessionService {
     private final @NotNull UserServiceDAO userServiceDAO;
@@ -80,5 +83,39 @@ public class GameSessionService {
             remotePointService.closeConnection(player1.getUserId(), CloseStatus.SERVER_ERROR);
             remotePointService.closeConnection(player2.getUserId(), CloseStatus.SERVER_ERROR);
         }
+    }
+
+    public void tryStartGame(@NotNull GameSession gameSession) {
+        if (gameSession.isFieldsSetuped()) {
+           final Player attackingPlayer = chooseRandPlayer(gameSession.getPlayer1(), gameSession.getPlayer2());
+           gameSession.setAttackingSide(attackingPlayer);
+           gameSession.setGameSessionState(GameSessionState.GAME);
+
+            try {
+                remotePointService.sendMeassageToUser(gameSession.getPlayer1().getUserId(),
+                                                        new MsgGameStarted(gameSession.getPlayer1().equals(attackingPlayer)));
+                remotePointService.sendMeassageToUser(gameSession.getPlayer2().getUserId(),
+                        new MsgGameStarted(gameSession.getPlayer2().equals(attackingPlayer)));
+            } catch (IOException e) {
+                // TODO : exception или обратную рассылку
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public Boolean isPlaying(@NotNull String userId) {
+        return gameSessions.containsKey(userId);
+    }
+
+    public GameSession getGameSessionByUserId(String userId) {
+        return gameSessions.get(userId);
+    }
+
+    private Player chooseRandPlayer(Player player1, Player player2) {
+        if (ThreadLocalRandom.current().nextInt(0, 2) == 0) {
+            return player1;
+        }
+        return player2;
     }
 }

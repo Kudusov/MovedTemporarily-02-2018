@@ -29,6 +29,9 @@ public class GameSession {
         }
     }
 
+    public Boolean isFieldsSetuped() {
+        return player1.getField() != null && player2.getField() != null;
+    }
 
     public Player getPlayer1() {
         return player1;
@@ -48,5 +51,9 @@ public class GameSession {
 
     public GameSessionState getGameSessionState() {
         return gameSessionState;
+    }
+
+    public void setGameSessionState(GameSessionState gameSessionState) {
+        this.gameSessionState = gameSessionState;
     }
 }

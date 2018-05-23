@@ -27,7 +27,7 @@ public class UserPlayer implements Player {
     public UserPlayer() {
         this.playerId = PLAYER_ID_GENERATOR.getAndIncrement();
         this.user = null;
-        field = new Field();
+        field = null;
     }
 
     public UserPlayer(List<Ship> ships) {
@@ -40,7 +40,7 @@ public class UserPlayer implements Player {
     public UserPlayer(UserInfoForm user) {
         this.playerId = PLAYER_ID_GENERATOR.getAndIncrement();
         this.user = user;
-        field = new Field();
+        field = null;
     }
     @Override
     public Long getPlayerId() {
@@ -80,6 +80,7 @@ public class UserPlayer implements Player {
     @Override
     public void setAliveShips(List<Ship> aliveShips) {
         this.aliveShips = aliveShips;
+        this.field = new Field(aliveShips);
     }
 
     @Override
