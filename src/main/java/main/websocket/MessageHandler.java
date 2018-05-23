@@ -10,13 +10,13 @@ public abstract class MessageHandler<T extends Message> {
     }
 
     // TODO : реализовать exceptions в случае ошибки
-    public void handleMessage(@NotNull Message message, Long forUserId) throws HandleException {
+    public void handleMessage(@NotNull Message message, String userId) throws HandleException {
         try {
-            handle(clazz.cast(message), forUserId);
+            handle(clazz.cast(message), userId);
         } catch (ClassCastException ex) {
             throw new HandleException("Can't read incoming message of type " + message.getClass(), ex);
         }
     }
 
-    public abstract void handle(@NotNull T message, @NotNull Long forUserId);
+    public abstract void handle(@NotNull T message, @NotNull String userId);
 }

@@ -13,26 +13,26 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class RemotePointService {
-    private final Map<Long, WebSocketSession> sessions = new ConcurrentHashMap<>();
+    private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
 
     public RemotePointService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
-    public void registerUser(@NotNull Long userId, @NotNull WebSocketSession webSocketSession){
+    public void registerUser(@NotNull String userId, @NotNull WebSocketSession webSocketSession){
         sessions.put(userId, webSocketSession);
     }
 
-    public boolean isConnected(@NotNull Long userId) {
+    public boolean isConnected(@NotNull String userId) {
         return sessions.containsKey(userId) && sessions.get(userId).isOpen();
     }
 
-    public void removeUser(@NotNull Long userId) {
+    public void removeUser(@NotNull String userId) {
         sessions.remove(userId);
     }
 
-    public void closeConnection(@NotNull Long userId, @NotNull CloseStatus closeStatus) {
+    public void closeConnection(@NotNull String userId, @NotNull CloseStatus closeStatus) {
         final WebSocketSession webSocketSession = sessions.get(userId);
         if (webSocketSession != null && webSocketSession.isOpen()) {
             try {
@@ -43,7 +43,7 @@ public class RemotePointService {
         }
     }
 
-    public void sendMeassageToUser(@NotNull Long userId, @NotNull Message message) throws IOException {
+    public void sendMeassageToUser(@NotNull String userId, @NotNull Message message) throws IOException {
         final WebSocketSession webSocketSession = sessions.get(userId);
         if (webSocketSession == null) {
             throw new IOException("no game websocket for user " + userId);

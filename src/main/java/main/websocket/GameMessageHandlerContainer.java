@@ -12,7 +12,7 @@ public class GameMessageHandlerContainer implements MessageHandlerContainer {
     private final Map<Class<?>, MessageHandler<?>> handlerMap = new HashMap<>();
 
     @Override
-    public void handle(@NotNull Message message, Long forUserId) throws HandleException {
+    public void handle(@NotNull Message message, String forUserId) throws HandleException {
         final MessageHandler<?> messageHandler = handlerMap.get(message.getClass());
         if (messageHandler == null) {
             throw new HandleException("no handler for message of " + message.getClass().getName() + " type");

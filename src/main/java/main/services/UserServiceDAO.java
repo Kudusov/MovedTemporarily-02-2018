@@ -34,9 +34,13 @@ public class UserServiceDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private Integer getIdByLogin(String login) {
-        final String query = "SELECT Id FROM Users WHERE login = ?";
-        return jdbcTemplate.queryForObject(query, Integer.class, login);
+    public Integer getIdByLogin(String login) {
+        try {
+            final String query = "SELECT Id FROM Users WHERE login = ?";
+            return jdbcTemplate.queryForObject(query, Integer.class, login);
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        }
     }
 
     // сделать обертку над этим методом чтобы при ошибке произошел Rollback
