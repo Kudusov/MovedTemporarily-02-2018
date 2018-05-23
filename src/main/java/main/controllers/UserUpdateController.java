@@ -13,7 +13,9 @@ import javax.servlet.http.HttpSession;
 
 
 @RestController
-@CrossOrigin(origins = {"https://moved-temporarily-front.herokuapp.com", "https://moved-temp-front.herokuapp.com"}, allowCredentials = "true", methods = {RequestMethod.PUT, RequestMethod.POST})
+@CrossOrigin(origins = {"https://moved-temporarily-front.herokuapp.com",
+                        "https://moved-temp-front.herokuapp.com",
+                        "https://temp-appsss.herokuapp.com"}, allowCredentials = "true", methods = {RequestMethod.PUT, RequestMethod.POST})
 public class UserUpdateController {
     private UserServiceDAO userService;
 
