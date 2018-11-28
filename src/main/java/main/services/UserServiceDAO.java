@@ -1,7 +1,9 @@
 package main.services;
 
+import main.DAO.UserDAO;
 import main.models.User;
 import main.views.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -30,50 +32,46 @@ public class UserServiceDAO {
     
     private JdbcTemplate jdbcTemplate;
 
+
+//    @Autowired
     public UserServiceDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Integer getIdByLogin(String login) {
-        try {
-            final String query = "SELECT Id FROM Users WHERE login = ?";
-            return jdbcTemplate.queryForObject(query, Integer.class, login);
-        } catch (EmptyResultDataAccessException ex) {
-            return null;
-        }
-    }
+
 
     // сделать обертку над этим методом чтобы при ошибке произошел Rollback
     // и монжно было  возвращать коды ошибок
     @Transactional
     public void signUp(User userData) {
-        final String createUserQuery = "INSERT INTO Users (email, login, password) VALUES(?, ?, ?)";
-        jdbcTemplate.update(createUserQuery, userData.getEmail(), userData.getLogin(), userData.getPassword());
-        final Integer userId = getIdByLogin(userData.getLogin());
-        final String createScore = "INSERT INTO Scores (user_id) VALUES (?)";
-        jdbcTemplate.update(createScore, userId);
-
+        addUserDB(userData);
     }
 
     public ErrorCodes login(LoginForm loginData) {
-        final LoginForm dbUser = getUserByIdOrEmail(loginData);
+        System.out.println("\nStarted\n");
+        final LoginForm dbUser = getUserByIdOrEmailDB(loginData);
+
         if (dbUser == null) {
+            System.out.println("dbUser == null");
             return ErrorCodes.INVALID_AUTH_DATA;
         }
 
         if (!dbUser.getPassword().equals(loginData.getPassword())) {
+            System.out.println("incorrect pass");
             return ErrorCodes.INCORRECT_PASSWORD;
         }
 
         loginData.setLogin(dbUser.getLogin());
+        System.out.println("all Ok");
         return ErrorCodes.OK;
 
     }
 
     public ErrorCodes getUserInfo(String login, UserInfoForm data) {
         try {
-            final String queryGetUserByLogin = "Select email, login From Users where login = ?";
-            final UserInfoForm dbUser = jdbcTemplate.queryForObject(queryGetUserByLogin, USER_INFO_FORM_ROW_MAPPER, login);
+//            final String queryGetUserByLogin = "Select email, login From Users where login = ?";
+//            final UserInfoForm dbUser = jdbcTemplate.queryForObject(queryGetUserByLogin, USER_INFO_FORM_ROW_MAPPER, login);
+            final UserInfoForm dbUser = getUserInfoDB(login);
             data.setLogin(dbUser.getLogin());
             data.setEmail(dbUser.getEmail());
             return ErrorCodes.OK;
@@ -87,8 +85,7 @@ public class UserServiceDAO {
             return ErrorCodes.INVALID_LOGIN;
         }
         try {
-            final String queryChangeMail = "Update Users Set email = ? Where login = ?";
-            jdbcTemplate.update(queryChangeMail, mailData.getNewEmail(), login);
+            changeMailDB(login, mailData.getNewEmail());
             return ErrorCodes.OK;
         } catch (DuplicateKeyException ex) {
             return ErrorCodes.EMAIL_OCCUPIED;
@@ -101,12 +98,13 @@ public class UserServiceDAO {
         }
 
         try {
-            final LoginForm user = getUserByLogin(login);
+            final LoginForm user = getUserByLoginDB(login);
             if (!passData.getOldPassword().equals(user.getPassword())) {
                 return ErrorCodes.INCORRECT_PASSWORD;
             }
-            final String queryChangePass = "Update Users Set password = ? WHERE login = ?";
-            jdbcTemplate.update(queryChangePass, passData.getNewPassword(), login);
+//            final String queryChangePass = "Update Users Set password = ? WHERE login = ?";
+//            jdbcTemplate.update(queryChangePass, passData.getNewPassword(), login);
+            changePassDB(login, passData.getNewPassword());
         } catch (EmptyResultDataAccessException ex) {
             return ErrorCodes.INVALID_LOGIN;
         }
@@ -149,13 +147,41 @@ public class UserServiceDAO {
 
     }
 
-    @SuppressWarnings("unused")
-    private Integer getNextId() {
-        final String sqlGetNext = "SELECT nextval(pg_get_serial_sequence('Users', 'id'))";
-        return jdbcTemplate.queryForObject(sqlGetNext, Integer.class);
+    @Transactional
+    public void addUserDB(User userData) {
+        final String createUserQuery = "INSERT INTO Users (email, login, password) VALUES(?, ?, ?)";
+        jdbcTemplate.update(createUserQuery, userData.getEmail(), userData.getLogin(), userData.getPassword());
+        final Integer userId = getIdByLoginDB(userData.getLogin());
+        final String createScore = "INSERT INTO Scores (user_id) VALUES (?)";
+        jdbcTemplate.update(createScore, userId);
     }
 
-    private LoginForm getUserByIdOrEmail(LoginForm loginData) {
+    public Integer getIdByLoginDB(String login) {
+        try {
+            final String query = "SELECT Id FROM Users WHERE login = ?";
+            return jdbcTemplate.queryForObject(query, Integer.class, login);
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        }
+    }
+
+    public UserInfoForm getUserInfoDB(String login) {
+        final String queryGetUserByLogin = "Select email, login From Users where login = ?";
+        return jdbcTemplate.queryForObject(queryGetUserByLogin, USER_INFO_FORM_ROW_MAPPER, login);
+    }
+
+    public void changeMailDB(String login, String newMail) {
+        final String queryChangeMail = "Update Users Set email = ? Where login = ?";
+        jdbcTemplate.update(queryChangeMail, newMail, login);
+    }
+
+    public void changePassDB(String login, String newPass) {
+        final String queryChangePass = "Update Users Set password = ? WHERE login = ?";
+        jdbcTemplate.update(queryChangePass, newPass, login);
+    }
+
+
+    public LoginForm getUserByIdOrEmailDB(LoginForm loginData) {
         try {
             final String getUserByIdOrNickname = "SELECT * From users Where login = ? OR email = ? LIMIT 1";
             return jdbcTemplate.queryForObject(getUserByIdOrNickname, LOGIN_FORM_ROW_MAPPER, loginData.getLogin(), loginData.getEmail());
@@ -164,7 +190,7 @@ public class UserServiceDAO {
         }
     }
 
-    private LoginForm getUserByLogin(String login) {
+    private LoginForm getUserByLoginDB(String login) {
         final String getUserByIdOrNickname = "SELECT * From users Where login = ? ";
         return jdbcTemplate.queryForObject(getUserByIdOrNickname, LOGIN_FORM_ROW_MAPPER, login);
     }

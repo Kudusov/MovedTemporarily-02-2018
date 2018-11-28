@@ -2,6 +2,8 @@ package main.controllers;
 
 import main.Main;
 import com.github.javafaker.Faker;
+import main.services.UserServiceDAO;
+import main.views.LoginForm;
 import main.views.ResponseMsg;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
@@ -26,6 +28,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.*;
+
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Main.class)
@@ -59,6 +63,19 @@ public class AuthenticateControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.msg").value(ResponseMsg.CREATED.getMsg()));
     }
+
+//    @Test
+//    public void someMockTest() throws Exception {
+//        UserServiceDAO m = mock(UserServiceDAO.class);
+//        LoginForm l = new LoginForm("qwertyqwerty", "qwerty@mail.ru", "somepass");
+//        LoginForm l2 = new LoginForm("qwertyqwerty", "qwerty@mail.ru", "somepass");
+//
+//        when(m.getUserByIdOrEmailDB(l)).thenReturn(l2);
+//        when(m.login(l)).thenCallRealMethod();
+//        final UserServiceDAO.ErrorCodes errorCode = m.login(l);
+//        System.out.println(l.getLogin() + l.getPassword());
+//        assertEquals(errorCode, UserServiceDAO.ErrorCodes.OK);
+//    }
 
     @Test
     public void signUpOk() throws Exception {

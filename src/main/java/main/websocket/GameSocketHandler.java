@@ -47,7 +47,7 @@ public class GameSocketHandler extends TextWebSocketHandler {
 
         final String userId = (String) webSocketSession.getAttributes().get("userLogin");
 
-        if (userId == null || userService.getIdByLogin(userId) == null) {
+        if (userId == null || userService.getIdByLoginDB(userId) == null) {
             closeSessionSilently(webSocketSession, ACCESS_DENIED);
             return;
         }
@@ -67,7 +67,7 @@ public class GameSocketHandler extends TextWebSocketHandler {
         }
 
         final String userId = (String) webSocketSession.getAttributes().get("userLogin");
-        if (userId == null || userService.getIdByLogin(userId) == null) {
+        if (userId == null || userService.getIdByLoginDB(userId) == null) {
             System.out.println("Unauthorized user");
             closeSessionSilently(webSocketSession, ACCESS_DENIED);
             return;

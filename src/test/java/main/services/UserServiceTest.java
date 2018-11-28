@@ -1,19 +1,27 @@
 package main.services;
 
+import com.github.javafaker.Faker;
 import main.models.User;
 import main.views.*;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -25,6 +33,92 @@ public class UserServiceTest {
 
     private final User testUser = new User("e.mail@mail.ru", "test", "test", 1337);
 
+    private static Faker faker;
+    private static String email;
+    private static String login;
+    private static String password;
+
+
+    @BeforeEach
+    public static void setUpValues() {
+        faker = new Faker(new Locale("en-US"));
+        email = faker.internet().emailAddress();
+        login = faker.name().username();
+        password = faker.internet().password();
+    }
+
+    @Test
+    public void loginCorrectWithMock() throws Exception {
+        UserServiceDAO m = mock(UserServiceDAO.class);
+        LoginForm l = new LoginForm("qwertyqwerty", "qwerty@mail.ru", "somepass");
+        LoginForm l2 = new LoginForm("qwertyqwerty", "qwerty@mail.ru", "somepass");
+
+        when(m.getUserByIdOrEmailDB(l)).thenReturn(l2);
+        when(m.login(l)).thenCallRealMethod();
+        final UserServiceDAO.ErrorCodes errorCode = m.login(l);
+        assertEquals(errorCode, UserServiceDAO.ErrorCodes.OK);
+    }
+
+    @Test
+    public void loginIncorrectDataWithMock() throws Exception {
+        UserServiceDAO m = mock(UserServiceDAO.class);
+        LoginForm l = new LoginForm("qwertyqwerty", "qwerty@mail.ru", "somepass");
+
+        when(m.getUserByIdOrEmailDB(any(LoginForm.class))).thenReturn(null);
+        when(m.login(any(LoginForm.class))).thenCallRealMethod();
+        final UserServiceDAO.ErrorCodes errorCode = m.login(l);
+        assertEquals(errorCode, UserServiceDAO.ErrorCodes.INVALID_AUTH_DATA);
+    }
+
+    @Test
+    public void loginWithIncorrectPasMock() {
+        UserServiceDAO m = mock(UserServiceDAO.class);
+        LoginForm l = new LoginForm("qwertyqwerty", "qwerty@mail.ru", "somepass");
+        LoginForm l2 = new LoginForm("qwertyqwerty", "qwerty@mail.ru", "anotherpass");
+
+        when(m.getUserByIdOrEmailDB(l)).thenReturn(l2);
+        when(m.login(any(LoginForm.class))).thenCallRealMethod();
+        final UserServiceDAO.ErrorCodes errorCode = m.login(l);
+        assertEquals(errorCode, UserServiceDAO.ErrorCodes.INCORRECT_PASSWORD);
+    }
+    // ------------------------------ Testing DB Part of userService ---------------- //
+    @Test
+    public void getNotExistingUserFromDB() {
+        assertEquals(userServiceDAO.getIdByLoginDB(login), null);
+    }
+
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void getNotExistUserInfoFromDB() {
+        userServiceDAO.getUserInfoDB(login);
+    }
+
+    @Test
+    public void getExistUserInfoFromDB() {
+        User user = new User("hello", "world", "some_pass", 0);
+        userServiceDAO.addUserDB(user);
+        UserInfoForm result = userServiceDAO.getUserInfoDB(user.getLogin());
+        assertEquals(result.getEmail(), user.getEmail());
+        assertEquals(result.getLogin(), user.getLogin());
+    }
+
+//    @Test(expected = NullPointerException.class)
+//    public void changeMailNotExistUserDB() {
+//        userServiceDAO.changeMailDB("hello", "world");
+//    }
+
+    @Test
+    public void changeMailUserDB() {
+        setUpValues();
+        User user = new User(faker.internet().emailAddress(), faker.name().username(), faker.internet().password(), 0);
+        userServiceDAO.addUserDB(user);
+        email = faker.internet().emailAddress();
+        userServiceDAO.changeMailDB(user.getLogin(), email);
+        UserInfoForm updateUser = userServiceDAO.getUserInfoDB(user.getLogin());
+        assertEquals(updateUser.getEmail(), email);
+    }
+
+    // ---------------- Ending DB Testing ----------------------//
     @Test
     public void signUpSuccess() {
         userServiceDAO.signUp(testUser);
@@ -58,7 +152,7 @@ public class UserServiceTest {
         loginForm.setEmail(testUser.getEmail());
         errorCode = userServiceDAO.login(loginForm);
 
-        assertEquals(null, loginForm.getLogin());
+        assertEquals(testUser.getLogin(), loginForm.getLogin());
         assertEquals(testUser.getEmail(), loginForm.getEmail());
         assertEquals(testUser.getPassword(), loginForm.getPassword());
         assertEquals(errorCode, UserServiceDAO.ErrorCodes.OK);
