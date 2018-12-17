@@ -69,8 +69,6 @@ public class UserServiceDAO {
 
     public ErrorCodes getUserInfo(String login, UserInfoForm data) {
         try {
-//            final String queryGetUserByLogin = "Select email, login From Users where login = ?";
-//            final UserInfoForm dbUser = jdbcTemplate.queryForObject(queryGetUserByLogin, USER_INFO_FORM_ROW_MAPPER, login);
             final UserInfoForm dbUser = getUserInfoDB(login);
             data.setLogin(dbUser.getLogin());
             data.setEmail(dbUser.getEmail());
@@ -102,8 +100,6 @@ public class UserServiceDAO {
             if (!passData.getOldPassword().equals(user.getPassword())) {
                 return ErrorCodes.INCORRECT_PASSWORD;
             }
-//            final String queryChangePass = "Update Users Set password = ? WHERE login = ?";
-//            jdbcTemplate.update(queryChangePass, passData.getNewPassword(), login);
             changePassDB(login, passData.getNewPassword());
         } catch (EmptyResultDataAccessException ex) {
             return ErrorCodes.INVALID_LOGIN;

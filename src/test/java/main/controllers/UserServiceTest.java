@@ -1,15 +1,19 @@
-package main.services;
+package main.controllers;
 
 import com.github.javafaker.Faker;
 import main.models.User;
+import main.services.UserServiceDAO;
 import main.views.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,14 +21,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class UserServiceTest {
 
     @Autowired
@@ -58,22 +63,26 @@ public class UserServiceTest {
         assertEquals(dbUser.getEmail(), user.getEmail());
     }
 
-    @Test(expected = DuplicateKeyException.class)
+    @Test()
     public  void addUserWithExistingLoginDB() {
-        setUpValues();
-        final User user = new User(faker.internet().emailAddress(), faker.name().username(), faker.internet().password(), 0);
-        userServiceDAO.addUserDB(user);
-        final User user2 = new User(faker.internet().emailAddress(), user.getLogin(), faker.internet().password(), 0);
-        userServiceDAO.addUserDB(user2);
+        Assertions.assertThrows(DuplicateKeyException.class, () -> {
+            setUpValues();
+            final User user = new User(faker.internet().emailAddress(), faker.name().username(), faker.internet().password(), 0);
+            userServiceDAO.addUserDB(user);
+            final User user2 = new User(faker.internet().emailAddress(), user.getLogin(), faker.internet().password(), 0);
+            userServiceDAO.addUserDB(user2);
+        });
     }
 
-    @Test(expected = DuplicateKeyException.class)
+    @Test()
     public  void addUserWithExistingEmailDB() {
-        setUpValues();
-        final User user = new User(faker.internet().emailAddress(), faker.name().username(), faker.internet().password(), 0);
-        userServiceDAO.addUserDB(user);
-        final User user2 = new User(user.getEmail(), faker.name().username(), faker.internet().password(), 0);
-        userServiceDAO.addUserDB(user2);
+        Assertions.assertThrows(DuplicateKeyException.class, () -> {
+            setUpValues();
+            final User user = new User(faker.internet().emailAddress(), faker.name().username(), faker.internet().password(), 0);
+            userServiceDAO.addUserDB(user);
+            final User user2 = new User(user.getEmail(), faker.name().username(), faker.internet().password(), 0);
+            userServiceDAO.addUserDB(user2);
+        });
     }
 
     @Test
@@ -83,9 +92,11 @@ public class UserServiceTest {
     }
 
 
-    @Test(expected = EmptyResultDataAccessException.class)
+    @Test()
     public void getNotExistUserInfoFromDB() {
-        userServiceDAO.getUserInfoDB(login);
+        Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
+            userServiceDAO.getUserInfoDB(login);
+        });
     }
 
     @Test
@@ -109,14 +120,16 @@ public class UserServiceTest {
         assertEquals(updateUser.getEmail(), email);
     }
 
-    @Test(expected = DuplicateKeyException.class)
+    @Test()
     public void changeMailUserToExistingDB() {
-        setUpValues();
-        final User user1 = new User(faker.internet().emailAddress(), faker.name().username(), faker.internet().password(), 0);
-        userServiceDAO.addUserDB(user1);
-        final User user2 = new User(faker.internet().emailAddress(), faker.name().username(), faker.internet().password(), 0);
-        userServiceDAO.addUserDB(user2);
-        userServiceDAO.changeMailDB(user1.getLogin(), user2.getEmail());
+        Assertions.assertThrows(DuplicateKeyException.class, () -> {
+            setUpValues();
+            final User user1 = new User(faker.internet().emailAddress(), faker.name().username(), faker.internet().password(), 0);
+            userServiceDAO.addUserDB(user1);
+            final User user2 = new User(faker.internet().emailAddress(), faker.name().username(), faker.internet().password(), 0);
+            userServiceDAO.addUserDB(user2);
+            userServiceDAO.changeMailDB(user1.getLogin(), user2.getEmail());
+        });
     }
 
 
@@ -177,17 +190,21 @@ public class UserServiceTest {
         userServiceDAO.signUp(testUser);
     }
 
-    @Test(expected = DuplicateKeyException.class)
+    @Test
     public void signUpDuplicateEmail() {
+        Assertions.assertThrows(DuplicateKeyException.class, () -> {
         userServiceDAO.signUp(testUser);
         userServiceDAO.signUp(new User(testUser.getEmail(), "test2", "test", 0));
+        });
     }
 
 
-    @Test(expected = DuplicateKeyException.class)
+    @Test()
     public void signUpDuplicateLogin() {
-        userServiceDAO.signUp(testUser);
-        userServiceDAO.signUp(new User("mail@mail.ru", testUser.getLogin(), "test", 0));
+        Assertions.assertThrows(DuplicateKeyException.class, () -> {
+            userServiceDAO.signUp(testUser);
+            userServiceDAO.signUp(new User("mail@mail.ru", testUser.getLogin(), "test", 0));
+        });
     }
 
     @Test
