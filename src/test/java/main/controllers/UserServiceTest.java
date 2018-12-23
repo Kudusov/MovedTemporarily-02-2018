@@ -135,6 +135,7 @@ public class UserServiceTest {
 
     @Test
     public void changePassDB() {
+//        assertEquals(true, false);
         setUpValues();
         final User user = new User(faker.internet().emailAddress(), faker.name().username(), faker.internet().password(), 0);
         userServiceDAO.addUserDB(user);

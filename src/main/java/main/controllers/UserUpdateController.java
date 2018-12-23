@@ -48,6 +48,7 @@ public class UserUpdateController {
 
     @RequestMapping(path = "/api/user/changePass", method = RequestMethod.PUT)
     public ResponseEntity changePass(@RequestBody PassForm passData, HttpSession session) {
+        //some changes here
         final String login = (String) session.getAttribute("userLogin");
         if (login == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseMsg.NOT_LOGGED_IN);

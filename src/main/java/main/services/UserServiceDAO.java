@@ -48,6 +48,7 @@ public class UserServiceDAO {
     }
 
     public ErrorCodes login(LoginForm loginData) {
+        //some changes here
         System.out.println("\nStarted\n");
         final LoginForm dbUser = getUserByIdOrEmailDB(loginData);
 
@@ -68,6 +69,7 @@ public class UserServiceDAO {
     }
 
     public ErrorCodes getUserInfo(String login, UserInfoForm data) {
+        // some changes here
         try {
             final UserInfoForm dbUser = getUserInfoDB(login);
             data.setLogin(dbUser.getLogin());
@@ -91,6 +93,7 @@ public class UserServiceDAO {
     }
 
     public ErrorCodes changePass(String login, PassForm passData) {
+        // or some changes here
         if (!passData.isValid()) {
             return ErrorCodes.INCORRECT_PASSWORD;
         }
@@ -145,6 +148,7 @@ public class UserServiceDAO {
 
     @Transactional
     public void addUserDB(User userData) {
+        //some changes
         final String createUserQuery = "INSERT INTO Users (email, login, password) VALUES(?, ?, ?)";
         jdbcTemplate.update(createUserQuery, userData.getEmail(), userData.getLogin(), userData.getPassword());
         final Integer userId = getIdByLoginDB(userData.getLogin());
@@ -153,6 +157,7 @@ public class UserServiceDAO {
     }
 
     public Integer getIdByLoginDB(String login) {
+        //some changes
         try {
             final String query = "SELECT Id FROM Users WHERE login = ?";
             return jdbcTemplate.queryForObject(query, Integer.class, login);
